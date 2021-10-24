@@ -1,8 +1,8 @@
 {
   "name": "@boringdao/boringdao-sdk",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "BoringDAO SDK",
-  "repository": "",
+  "repository": "https://github.com/BoringDAO/boringdao-sdk",
   "author": "BoringDAO Author",
   "license": "MIT",
   "main": "dist/index.js",
