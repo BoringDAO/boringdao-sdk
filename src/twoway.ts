@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import {TWOWAY_CONTRACT_ADDRESSES, TWOWAY_TOKENS} from './constants/twoway'
 
 export const getContract = (
-  library: JsonRpcProvider,
+  provider: JsonRpcProvider,
   address: string | undefined,
   ABI: ContractInterface,
   account?: string | null | undefined
@@ -17,70 +17,70 @@ export const getContract = (
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
 
-  return new Contract(address ?? '', ABI, account ? library.getSigner(account).connectUnchecked() : library)
+  return new Contract(address ?? '', ABI, account ? provider.getSigner(account).connectUnchecked() : provider)
 }
 
 const getTwowayToken = (chainID: number) => TWOWAY_TOKENS.find((token) => token.chainID === chainID)
 
 export const crossOutUSDT = async (
-  library: JsonRpcProvider,
-  currentChainID: number,
+  provider: JsonRpcProvider,
+  fromChainID: number,
+  toChainID: number,
   account: string,
-  targetChainID: number,
   to: string,
   amount: string
 ): Promise<TransactionReceipt> => {
-  const token = getTwowayToken(currentChainID)
-  if (!token) throw Error(`Can't find twoway token(${currentChainID})`)
+  const token = getTwowayToken(fromChainID)
+  if (!token) throw Error(`Can't find twoway token(${fromChainID})`)
 
   return crossOut(
-    library,
-    currentChainID,
+    provider,
+    fromChainID,
+    toChainID,
     account,
     token.address,
-    targetChainID,
     to,
     ethers.utils.parseUnits(amount, token.decimals).toString()
   )
 }
 
 export const crossOut = async (
-  library: JsonRpcProvider,
-  currentChainID: number,
+  provider: JsonRpcProvider,
+  fromChainID: number,
+  toChainID: number,
   account: string,
   tokenAddress: string,
-  targetChainID: number,
   to: string,
   amount: string
 ): Promise<TransactionReceipt> => {
   console.debug(
-    `crossOut(current_chain_id: ${currentChainID}, account: ${account}, token_address: ${tokenAddress}, target_chain_id: ${targetChainID}, to: ${to}, amount: ${amount})`
+    `crossOut(current_chain_id: ${fromChainID}, account: ${account}, token_address: ${tokenAddress}, target_chain_id: ${toChainID}, to: ${to}, amount: ${amount})`
   )
-  const contract = getContract(library, TWOWAY_CONTRACT_ADDRESSES[currentChainID], TwowayABI, account)
+  const contract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[fromChainID], TwowayABI, account)
 
-  const tx = await contract?.crossOut(tokenAddress, targetChainID, to, amount)
+  const tx = await contract?.crossOut(tokenAddress, toChainID, to, amount)
 
   return tx.wait()
 }
 
 export const getCrossUSDTResult = async (
-  library: JsonRpcProvider,
-  targetLibrary: JsonRpcProvider,
-  currentChainID: number,
-  targetChainID: number,
+  provider: JsonRpcProvider,
+  targetProvider: JsonRpcProvider,
+  fromChainID: number,
+  toChainID: number,
   amount: string
 ): Promise<string[]> => {
-  const token = getTwowayToken(currentChainID)
-  if (!token) throw Error(`Can't find twoway token(${currentChainID})`)
-  const targetToken = getTwowayToken(targetChainID)
-  if (!targetToken) throw Error(`Can't find target twoway token(${currentChainID})`)
+  const token = getTwowayToken(fromChainID)
+  if (!token) throw Error(`Can't find twoway token(${fromChainID})`)
+  const targetToken = getTwowayToken(toChainID)
+  if (!targetToken) throw Error(`Can't find target twoway token(${fromChainID})`)
 
   const targetDiff = 18 - (targetToken?.decimals || 18)
-  const currentContract = getContract(library, TWOWAY_CONTRACT_ADDRESSES[currentChainID], TwowayABI)
-  const targetContract = getContract(targetLibrary, TWOWAY_CONTRACT_ADDRESSES[targetChainID], TwowayABI)
+  const currentContract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[fromChainID], TwowayABI)
+  const targetContract = getContract(targetProvider, TWOWAY_CONTRACT_ADDRESSES[toChainID], TwowayABI)
 
-  const maxToken1 = await currentContract?.getMaxToken1AmountOut(token.address, targetChainID)
-  const ratio = await targetContract?.feeRatioM(targetToken.address, currentChainID)
+  const maxToken1 = await currentContract?.getMaxToken1AmountOut(token.address, toChainID)
+  const ratio = await targetContract?.feeRatioM(targetToken.address, fromChainID)
   const valueN = ethers.utils.parseUnits(amount, 18).toString()
 
   let count = 2
@@ -88,7 +88,7 @@ export const getCrossUSDTResult = async (
     count = 1
   }
 
-  const fixedAmount = await targetContract?.feeAmountM(targetToken.address, currentChainID)
+  const fixedAmount = await targetContract?.feeAmountM(targetToken.address, fromChainID)
   const finalFixedAmount = new BigNumber(fixedAmount.toString()).multipliedBy(count).toString()
 
   const d = new BigNumber(amount).multipliedBy(ratio.toString())
@@ -96,24 +96,24 @@ export const getCrossUSDTResult = async (
   return [f.toString(), new BigNumber(valueN).minus(f).toString()]
 }
 
-export const getMaximumUSDTLiquidity = async (
-  library: JsonRpcProvider,
-  targetLibrary: JsonRpcProvider,
-  currentChainID: number,
-  targetChainID: number
+export const getUSDTLiquidity = async (
+  provider: JsonRpcProvider,
+  targetProvider: JsonRpcProvider,
+  fromChainID: number,
+  toChainID: number
 ): Promise<string> => {
-  const token = getTwowayToken(currentChainID)
-  if (!token) throw Error(`Can't find twoway token(${currentChainID})`)
-  const targetToken = getTwowayToken(targetChainID)
-  if (!targetToken) throw Error(`Can't find target twoway token(${currentChainID})`)
+  const token = getTwowayToken(fromChainID)
+  if (!token) throw Error(`Can't find twoway token(${fromChainID})`)
+  const targetToken = getTwowayToken(toChainID)
+  if (!targetToken) throw Error(`Can't find target twoway token(${fromChainID})`)
 
   const targetDiff = 18 - (targetToken?.decimals || 18)
 
-  const currentContract = getContract(library, token.pair, SwapPairABI)
-  const targetContract = getContract(targetLibrary, targetToken.pair, SwapPairABI)
+  const currentContract = getContract(provider, token.pair, SwapPairABI)
+  const targetContract = getContract(targetProvider, targetToken.pair, SwapPairABI)
 
-  const currentReserves = await currentContract.getReserves(targetChainID)
-  const targetReserves = await targetContract.getReserves(currentChainID)
+  const currentReserves = await currentContract.getReserves(toChainID)
+  const targetReserves = await targetContract.getReserves(fromChainID)
 
   const result = new BigNumber(targetReserves[0].toString())
     .multipliedBy(10 ** targetDiff)
