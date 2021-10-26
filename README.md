@@ -25,7 +25,14 @@ console.log(result[0].toString()) // Cross-chain fee
 console.log(result[1].toString()) // The USDT amount that user will get at destination chain(BSC)
 
 // 3. Cross USDT (Ethereum -> BSC, 100 USDT)
-crossOutUSDT(signer, 1, 65, "0x1fF1a0A34F5Da76d6e7d7ba2E9B809228B0d6113", "0x2fF1a0A34F5Da76d6e7d7ba2E9B809228B0d6113", "100")
+crossOutUSDT(
+  signer, 
+  1, 
+  65, 
+  "0x1fF1a0A34F5Da76d6e7d7ba2E9B809228B0d6113", 
+  "0x2fF1a0A34F5Da76d6e7d7ba2E9B809228B0d6113", 
+  "100"
+)
 ```
 
 ## crossOutUSDT
