@@ -1,29 +1,27 @@
-import {Contract, ContractInterface, ethers} from 'ethers'
+import {Contract, ContractInterface, ethers, Signer} from 'ethers'
 import {isAddress} from 'ethers/lib/utils'
 import {TransactionReceipt} from '@ethersproject/abstract-provider'
 import {AddressZero} from '@ethersproject/constants'
-import {JsonRpcProvider} from '@ethersproject/providers'
 import {SwapPairABI, TwowayABI} from './abi'
 import BigNumber from 'bignumber.js'
 import {TWOWAY_CONTRACT_ADDRESSES, TWOWAY_TOKENS} from './constants/twoway'
 
 export const getContract = (
-  provider: JsonRpcProvider,
+  signerOrProvider: Signer | ethers.providers.Provider,
   address: string | undefined,
   ABI: ContractInterface,
-  account?: string | null | undefined
 ): Contract => {
   if (!isAddress(address ?? '') || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
 
-  return new Contract(address ?? '', ABI, account ? provider.getSigner(account).connectUnchecked() : provider)
+  return new Contract(address ?? '', ABI, signerOrProvider)
 }
 
 const getTwowayToken = (chainID: number) => TWOWAY_TOKENS.find((token) => token.chainID === chainID)
 
 export const crossOutUSDT = async (
-  provider: JsonRpcProvider,
+  signerOrProvider: Signer | ethers.providers.Provider,
   fromChainID: number,
   toChainID: number,
   account: string,
@@ -34,7 +32,7 @@ export const crossOutUSDT = async (
   if (!token) throw Error(`Can't find twoway token(${fromChainID})`)
 
   return crossOut(
-    provider,
+    signerOrProvider,
     fromChainID,
     toChainID,
     account,
@@ -45,7 +43,7 @@ export const crossOutUSDT = async (
 }
 
 export const crossOut = async (
-  provider: JsonRpcProvider,
+  provider: Signer | ethers.providers.Provider,
   fromChainID: number,
   toChainID: number,
   account: string,
@@ -56,7 +54,7 @@ export const crossOut = async (
   console.debug(
     `crossOut(current_chain_id: ${fromChainID}, account: ${account}, token_address: ${tokenAddress}, target_chain_id: ${toChainID}, to: ${to}, amount: ${amount})`
   )
-  const contract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[fromChainID], TwowayABI, account)
+  const contract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[fromChainID], TwowayABI)
 
   const tx = await contract?.crossOut(tokenAddress, toChainID, to, amount)
 
@@ -64,8 +62,8 @@ export const crossOut = async (
 }
 
 export const getCrossUSDTResult = async (
-  provider: JsonRpcProvider,
-  targetProvider: JsonRpcProvider,
+  provider: ethers.providers.Provider,
+  targetProvider: ethers.providers.Provider,
   fromChainID: number,
   toChainID: number,
   amount: string
@@ -97,8 +95,8 @@ export const getCrossUSDTResult = async (
 }
 
 export const getUSDTLiquidity = async (
-  provider: JsonRpcProvider,
-  targetProvider: JsonRpcProvider,
+  provider: ethers.providers.Provider,
+  targetProvider: ethers.providers.Provider,
   fromChainID: number,
   toChainID: number
 ): Promise<string> => {

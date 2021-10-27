@@ -39,7 +39,7 @@ crossOutUSDT(
 
 ```typescript
 export const crossOutUSDT = async (
-  provider: JsonRpcProvider,
+  signerOrProvider: Signer | ethers.providers.Provider,
   fromChainID: number,
   toChainID: number,
   account: string,
@@ -48,7 +48,7 @@ export const crossOutUSDT = async (
 ): Promise<TransactionReceipt>
 ```
 
-`provider`: Wallet provider with account
+`signerOrProvider`: Provider or Signer
 
 `fromChainID`: Source chain id
 
@@ -65,8 +65,8 @@ export const crossOutUSDT = async (
 
 ```typescript
 export const getCrossUSDTResult = async (
-  provider: JsonRpcProvider,
-  targetProvider: JsonRpcProvider,
+  provider: ethers.providers.Provider,
+  targetProvider: ethers.providers.Provider,
   fromChainID: number,
   toChainID: number,
   amount: string
@@ -75,7 +75,7 @@ export const getCrossUSDTResult = async (
 
 The return value is fee amount and obtaining USDT amount
 
-`provider`: Wallet provider with account
+`provider`: Provider
 
 `targetProvider`: Destination chain provider
 
@@ -89,8 +89,8 @@ The return value is fee amount and obtaining USDT amount
 
 ```typescript
 export const getUSDTLiquidity = async (
-  provider: JsonRpcProvider,
-  targetProvider: JsonRpcProvider,
+  provider: ethers.providers.Provider,
+  targetProvider: ethers.providers.Provider,
   fromChainID: number,
   toChainID: number
 ): Promise<string>
@@ -98,7 +98,7 @@ export const getUSDTLiquidity = async (
 
 The return value is maximum cross-chain amount
 
-`provider`: Wallet provider with account
+`provider`: Provider
 
 `targetProvider`: Destination chain provider
 
