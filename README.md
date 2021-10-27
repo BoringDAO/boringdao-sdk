@@ -12,15 +12,15 @@ const signer = provider.getSigner() // provider with account
 // Destination chain provider
 const targetProvider =  new ethers.providers.JsonRpcProvider(
   'https://bsc-dataseed.binance.org/',
-  65
+  56
 )
 
 // 1. Get USDT liquidity (Ethereum -> BSC)
-const liquidity = await getUSDTLiquidity(signer, targetProvider, 1, 65)
+const liquidity = await getUSDTLiquidity(signer, targetProvider, 1, 56)
 console.log(liquidity.toString())
 
 // 2. Get cross-chain fee (Ethereum -> BSC, 100 USDT)
-const result = await getCrossUSDTResult(signer, targetProvider, 1, 65, "100")
+const result = await getCrossUSDTResult(signer, targetProvider, 1, 56, "100")
 console.log(result[0].toString()) // Cross-chain fee
 console.log(result[1].toString()) // The USDT amount that user will get at destination chain(BSC)
 
@@ -28,7 +28,7 @@ console.log(result[1].toString()) // The USDT amount that user will get at desti
 crossOutUSDT(
   signer, 
   1, 
-  65, 
+  56, 
   "0x1fF1a0A34F5Da76d6e7d7ba2E9B809228B0d6113", 
   "0x2fF1a0A34F5Da76d6e7d7ba2E9B809228B0d6113", 
   "100"
