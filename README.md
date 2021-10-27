@@ -16,16 +16,19 @@ const targetProvider =  new ethers.providers.JsonRpcProvider(
 )
 
 // 1. Get USDT liquidity (Ethereum -> BSC)
-const liquidity = await getUSDTLiquidity(signer, targetProvider, 1, 56)
+const liquidity = await getUSDTLiquidity(provider, targetProvider, 1, 56)
 console.log(liquidity.toString())
 
 // 2. Get cross-chain fee (Ethereum -> BSC, 100 USDT)
-const result = await getCrossUSDTResult(signer, targetProvider, 1, 56, "100")
+const result = await getCrossUSDTResult(provider, targetProvider, 1, 56, "100")
 console.log(result[0].toString()) // Cross-chain fee
 console.log(result[1].toString()) // The USDT amount that user will get at destination chain(BSC)
 
 // 3. Cross USDT (Ethereum -> BSC, 100 USDT)
-crossOutUSDT(
+// You should approve twoway contract to use your USDT before `crossOutUSDT`
+// You can get twoway contract address by function `getTwowayAddress` 
+// and get USDT address by function `getUSDTAddress` 
+await crossOutUSDT(
   signer, 
   1, 
   56, 
@@ -73,7 +76,7 @@ export const getCrossUSDTResult = async (
 ): Promise<string[]>
 ```
 
-The return value is fee amount and obtaining USDT amount
+The return value is fee amount and obtaining USDT amount(The decimal of result is 18)
 
 `provider`: Provider
 
@@ -96,7 +99,7 @@ export const getUSDTLiquidity = async (
 ): Promise<string>
 ```
 
-The return value is maximum cross-chain amount
+The return value(Decimal is 18) is maximum cross-chain amount
 
 `provider`: Provider
 
@@ -105,3 +108,19 @@ The return value is maximum cross-chain amount
 `fromChainID`: Source wallet chain id
 
 `toChainID`: Destination chain id
+
+## getTwowayAddress
+
+Get twoway address by chain id
+
+```typescript
+export const getTwowayAddress = (chainID: number) => {}
+```
+
+## getUSDTAddress
+
+Get USDT address by chain id
+
+```typescript
+export const getUSDTAddress = (chainID: number) => {}
+```

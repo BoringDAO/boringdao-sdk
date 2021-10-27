@@ -120,3 +120,12 @@ export const getUSDTLiquidity = async (
 
   return Promise.resolve(result)
 }
+
+export const getTwowayAddress = (chainID: number) => {
+  return TWOWAY_CONTRACT_ADDRESSES[chainID]
+}
+
+export const getUSDTAddress = (chainID: number) => {
+  const token = getTwowayToken(chainID)
+  return token?.address
+}
