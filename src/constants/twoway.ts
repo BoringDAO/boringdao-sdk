@@ -50,6 +50,24 @@ export const TWOWAY_CONTRACT_ADDRESSES: {[chainID: number]: string} = {
   [CHAIN_XDAI_TESTNET]: '0x25836668769f5017F29CA40967c5a2889a001550',
 }
 
+export const TWOWAY_CONTRACT_WEBSOCKET: {[chainID: number]: string} = {
+  [CHAIN_ETHER]: 'wss://mainnet.infura.io/ws/v3/09fc61c0350848d2abb958131e3a5876',
+  [CHAIN_BSC]: 'wss://bsc-ws-node.nariox.org:443',
+  [CHAIN_OK]:
+    'wss://apis.ankr.com/wss/d50ae3fe072547a5ad272b83cea911ab/17493a07f06838bfde72985c9f263be0/okexchain/full/main',
+  [CHAIN_POLYGON]: 'wss://speedy-nodes-nyc.moralis.io/1a2b3c4d5e6f1a2b3c4d5e6f/polygon/mainnet/ws',
+  [CHAIN_AVALANCHE]: 'wss://speedy-nodes-nyc.moralis.io/1a2b3c4d5e6f1a2b3c4d5e6f/avalanche/mainnet/ws',
+  [CHAIN_HARMONY_0]: 'wss://ws.s0.t.hmny.io/',
+  [CHAIN_HECO]:
+    'wss://apis.ankr.com/wss/240bbc536212424c8da5278eeaa73b24/17493a07f06838bfde72985c9f263be0/heco/fast/main',
+  [CHAIN_FANTOM]:
+    'wss://apis.ankr.com/wss/45e74fdba98e48ed910265ce082acd2d/17493a07f06838bfde72985c9f263be0/fantom/full/main',
+  [CHAIN_XDAI]:
+    'wss://apis.ankr.com/wss/29c93b1dfaa94f8e82fa28196c9b69c7/17493a07f06838bfde72985c9f263be0/xdai/fast/main',
+  [CHAIN_ARBITRUM]:
+    'wss://apis.ankr.com/wss/cff7cf15d9194d6cab27fc0ef5270754/17493a07f06838bfde72985c9f263be0/arbitrum/full/main',
+}
+
 export const TWOWAY_TOKENS: PegToken[] = [
   {
     symbol: 'USDT',

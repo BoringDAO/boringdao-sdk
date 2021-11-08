@@ -1,15 +1,15 @@
 import {Contract, ContractInterface, ethers, Signer} from 'ethers'
 import {isAddress} from 'ethers/lib/utils'
-import {TransactionReceipt} from '@ethersproject/abstract-provider'
+import {Listener, TransactionReceipt} from '@ethersproject/abstract-provider'
 import {AddressZero} from '@ethersproject/constants'
 import {SwapPairABI, TwowayABI} from './abi'
 import BigNumber from 'bignumber.js'
-import {TWOWAY_CONTRACT_ADDRESSES, TWOWAY_TOKENS} from './constants/twoway'
+import {TWOWAY_CONTRACT_ADDRESSES, TWOWAY_CONTRACT_WEBSOCKET, TWOWAY_TOKENS} from './constants/twoway'
 
 export const getContract = (
   signerOrProvider: Signer | ethers.providers.Provider,
   address: string | undefined,
-  ABI: ContractInterface,
+  ABI: ContractInterface
 ): Contract => {
   if (!isAddress(address ?? '') || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
@@ -30,7 +30,6 @@ export const crossOutUSDT = async (
 ): Promise<TransactionReceipt> => {
   const token = getTwowayToken(fromChainID)
   if (!token) throw Error(`Can't find twoway token(${fromChainID})`)
-
   return crossOut(
     signerOrProvider,
     fromChainID,
@@ -40,6 +39,25 @@ export const crossOutUSDT = async (
     to,
     ethers.utils.parseUnits(amount, token.decimals).toString()
   )
+}
+
+//  event CrossIn(address token0, address token1, uint256 chainID0,uint256 chainID1, address from, address to, uint256 amount,string txid);
+//  event Rollback(address token0, address token1, uint256 chainID0,uint256 chainID1, address from, address to, uint256 amount,string txid);
+export const onCrossListener = (
+  provider: Signer | ethers.providers.Provider,
+  toChainID: number,
+  successListener: Listener,
+  failListener: Listener
+): Contract => {
+  const toContract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[toChainID], TwowayABI)
+  toContract?.on('CrossIn', successListener)
+  toContract?.on('Rollback', failListener)
+  return toContract
+}
+
+export const offCrossListener = (toContract: Contract, successListener: Listener, failListener: Listener): void => {
+  toContract?.off('CrossIn', successListener)
+  toContract?.off('Rollback', failListener)
 }
 
 export const crossOut = async (
@@ -57,7 +75,6 @@ export const crossOut = async (
   const contract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[fromChainID], TwowayABI)
 
   const tx = await contract?.crossOut(tokenAddress, toChainID, to, amount)
-
   return tx.wait()
 }
 
