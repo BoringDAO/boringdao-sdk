@@ -1,5 +1,7 @@
 import {
   CHAIN_ARBITRUM,
+  CHAIN_ARBITRUM_TESTNET,
+  CHAIN_AURORA,
   CHAIN_AVALANCHE,
   CHAIN_AVALANCHE_TESTNET,
   CHAIN_BSC,
@@ -12,13 +14,16 @@ import {
   CHAIN_HARMONY_0_TESTNET,
   CHAIN_HECO,
   CHAIN_HECO_TESTNET,
+  CHAIN_METIS,
   CHAIN_OK,
   CHAIN_OK_TESTNET,
+  CHAIN_OPTIMISM,
   CHAIN_POLYGON,
   CHAIN_POLYGON_MUMBAI,
   CHAIN_XDAI,
   CHAIN_XDAI_TESTNET,
 } from '@w3u/chains'
+import {TwowayOToken} from '../interfaces/token'
 
 export interface PegToken {
   address: string
@@ -27,6 +32,23 @@ export interface PegToken {
   chainID: number
   pair: string
 }
+
+export const PRODUCTION_TWOWAY_CHAIN_IDS: number[] = [
+  CHAIN_BSC,
+  CHAIN_POLYGON,
+  CHAIN_ETHER,
+  CHAIN_OK,
+  CHAIN_HECO,
+  CHAIN_XDAI,
+  CHAIN_FANTOM,
+  CHAIN_METIS,
+  CHAIN_ARBITRUM,
+  CHAIN_AVALANCHE,
+  CHAIN_HARMONY_0,
+  CHAIN_OPTIMISM,
+  CHAIN_AURORA,
+]
+export const TWOWAY_CHAIN_IDS: number[] = [CHAIN_ETHER_KOVAN, CHAIN_POLYGON_MUMBAI, CHAIN_ARBITRUM_TESTNET]
 
 export const TWOWAY_CONTRACT_ADDRESSES: {[chainID: number]: string} = {
   [CHAIN_ETHER]: '0xF8393Bc60CF8CfcD442BcD742a4Aa847f4B6B4ac',
@@ -49,6 +71,72 @@ export const TWOWAY_CONTRACT_ADDRESSES: {[chainID: number]: string} = {
   [CHAIN_FANTOM_TESTNET]: '0x40a7Db10d41b0e16F8E264294E47A4719c706EA2',
   [CHAIN_XDAI_TESTNET]: '0x25836668769f5017F29CA40967c5a2889a001550',
 }
+
+export const OTOKENS: TwowayOToken[] = [
+  {
+    symbol: 'oUSDT',
+    address: '0x56700FB81834fDCe92616f7E7c4b8C8bb120957d',
+    chainID: CHAIN_POLYGON_MUMBAI,
+    decimals: 18,
+    pid: 0,
+  },
+  {
+    symbol: 'oUSDT',
+    address: '0x413cfE1C41F98879365D665CACB7E79a60001fEE',
+    chainID: CHAIN_POLYGON,
+    decimals: 18,
+    pid: 0,
+  },
+  {
+    symbol: 'oUSDC',
+    address: '0x8DE93f998b6b0ddA780Ee12B97dde1F2fADd3B1d',
+    chainID: CHAIN_POLYGON,
+    decimals: 18,
+    pid: 1,
+  },
+  // {
+  //   symbol: 'oLOL',
+  //   address: '0x0D9ceFE09299C8c3Cbe1F2706fbcEdBc35d73052',
+  //   chainID: CHAIN_POLYGON,
+  //   decimals: 18,
+  //   pid: 2,
+  // },
+  {
+    symbol: 'oIZI',
+    address: '0x79904eC9De1FCCF7ca50fE3f8430e922d53e07e6',
+    chainID: CHAIN_POLYGON,
+    decimals: 18,
+    pid: 3,
+  },
+  {
+    symbol: 'oETH',
+    address: '0x5E4e79E5Ea6515c95eA4433b8C985a0f5fAE442b',
+    chainID: CHAIN_POLYGON_MUMBAI,
+    decimals: 18,
+    pid: 0,
+  },
+  {
+    symbol: 'oETH',
+    address: '0x0caD6ef3383C4349c68f072076BCDE7B7623576B',
+    chainID: CHAIN_POLYGON,
+    decimals: 18,
+    pid: 6,
+  },
+  {
+    symbol: 'oMETIS',
+    address: '0x746158B125447C909291cf3B271C929D156cBAd2',
+    chainID: CHAIN_POLYGON,
+    decimals: 18,
+    pid: 5,
+  },
+  // {
+  //   symbol: 'oFIN',
+  //   address: '0x4D98192A8A078D0937c8FCa144C07e741364BdcA',
+  //   chainID: CHAIN_POLYGON,
+  //   decimals: 18,
+  //   pid: 4,
+  // },
+]
 
 export const TWOWAY_TOKENS: PegToken[] = [
   {
