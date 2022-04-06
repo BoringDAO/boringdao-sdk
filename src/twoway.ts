@@ -207,6 +207,17 @@ export class Twoway {
     }
   }
 
+  getTreasuryTo = async (provider: ethers.providers.Provider | Signer, chainId: number): Promise<string> => {
+    const twowayContract = getContract(provider, TWOWAY_CONTRACT_ADDRESSES[chainId], TwowayABI.abi)
+    try {
+      const to = await twowayContract.treasuryTo()
+      return Promise.resolve(to)
+    } catch (e) {
+      console.error('fuck: ', e)
+      return Promise.reject(e)
+    }
+  }
+
   getTwowayLockBalances = async (
     relayProvider: ethers.providers.Provider,
     relayChainId: number,
